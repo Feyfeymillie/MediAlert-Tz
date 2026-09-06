@@ -77,11 +77,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "MediAlert — Wearable Adherence Prototype" },
+      { name: "description", content: "Conceptual prototype of a hospital-linked wearable antibiotic adherence system." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "MediAlert — Wearable Adherence Prototype" },
+      { property: "og:description", content: "Conceptual prototype of a hospital-linked wearable antibiotic adherence system." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
@@ -119,8 +119,34 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="border-b border-border bg-card">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4 px-4 py-3">
+            <span className="font-bold tracking-tight">MediAlert</span>
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
+              Conceptual prototype — not production hardware or a real hospital integration
+            </span>
+            <nav className="ml-auto flex gap-1 text-sm">
+              <Link
+                to="/"
+                activeProps={{ className: "bg-secondary font-semibold" }}
+                className="rounded-md px-3 py-1.5"
+              >
+                Clinician &amp; wearable
+              </Link>
+              <Link
+                to="/dashboard"
+                activeProps={{ className: "bg-secondary font-semibold" }}
+                className="rounded-md px-3 py-1.5"
+              >
+                Dashboard
+              </Link>
+            </nav>
+          </div>
+        </header>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </div>
     </QueryClientProvider>
   );
 }

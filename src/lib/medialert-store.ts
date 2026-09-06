@@ -62,9 +62,9 @@ function seedPatient(
 ): Patient {
   if (!rx) return { id, firstName, lastName, age, ward, prescription: null, doses: [] };
   const doses = buildDoses(rx.times, rx.durationDays);
-  for (let i = 0; i < takenCount && i < doses.length; i++) doses[i].status = "taken";
+  for (let i = 0; i < takenCount && i < doses.length; i++) doses[i]!.status = "taken";
   for (let i = takenCount; i < takenCount + missedCount && i < doses.length; i++)
-    doses[i].status = "missed";
+    doses[i]!.status = "missed";
   return {
     id,
     firstName,
@@ -157,7 +157,7 @@ export function useMediAlert() {
 }
 
 export function getActivePatient(s: State) {
-  return s.patients.find((p) => p.id === s.activePatientId) ?? s.patients[0];
+  return s.patients.find((p) => p.id === s.activePatientId) ?? s.patients[0]!;
 }
 
 export function setActivePatient(id: string) {
@@ -190,7 +190,7 @@ const REMINDERS = [
 export function triggerReminder() {
   const p = getActivePatient(state);
   if (!p.prescription) return;
-  const pick = REMINDERS[Math.floor(Math.random() * REMINDERS.length)];
+  const pick = REMINDERS[Math.floor(Math.random() * REMINDERS.length)]!;
   state.lastMessage = pick(p.firstName);
   state.wearableState = "reminder";
   emit();
@@ -213,7 +213,7 @@ export function logDose(status: Exclude<DoseStatus, "pending">) {
   next.status = status;
   state.lastLogged = status;
   if (status === "taken") {
-    const a = AFFIRM[Math.floor(Math.random() * AFFIRM.length)];
+    const a = AFFIRM[Math.floor(Math.random() * AFFIRM.length)]!;
     state.lastMessage = a(p.firstName);
   } else {
     state.lastMessage = SAFE_GUIDANCE;

@@ -175,3 +175,11 @@
     color: var(--color-foreground);
   }
 }
+
+@keyframes ma-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes ma-scale-in { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+@keyframes ma-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+
+@utility animate-fade-in { animation: ma-fade-in 0.35s ease-out; }
+@utility animate-scale-in { animation: ma-scale-in 0.3s ease-out; }
+@utility pulse { animation: ma-pulse 1.6s ease-in-out infinite; }

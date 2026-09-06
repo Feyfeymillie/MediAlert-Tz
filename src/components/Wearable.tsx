@@ -22,7 +22,7 @@ function Ring({ pct }: { pct: number }) {
   const c = 2 * Math.PI * r;
   return (
     <svg viewBox="0 0 64 64" className="size-16" role="img" aria-label={`${pct}% of doses taken`}>
-      <circle cx="32" cy="32" r={r} className="fill-none stroke-muted" strokeWidth="6" />
+      <circle cx="32" cy="32" r={r} className="fill-none stroke-watch-chip" strokeWidth="6" />
       <circle
         cx="32"
         cy="32"
@@ -34,7 +34,7 @@ function Ring({ pct }: { pct: number }) {
         strokeDashoffset={c - (c * pct) / 100}
         transform="rotate(-90 32 32)"
       />
-      <text x="32" y="37" textAnchor="middle" className="fill-foreground text-[14px] font-semibold">
+      <text x="32" y="37" textAnchor="middle" className="fill-watch-foreground text-[14px] font-semibold">
         {pct}%
       </text>
     </svg>

@@ -196,6 +196,23 @@ export function triggerReminder() {
   emit();
 }
 
+export function snoozeReminder() {
+  const p = getActivePatient(state);
+  if (!p.prescription) return;
+  state.wearableState = "idle";
+  state.lastMessage = `Snoozed — we'll nudge you again shortly, ${p.firstName}.`;
+  emit();
+  // Simulated snooze: re-prompt after a few seconds in the demo.
+  setTimeout(() => {
+    const stillPending = p.doses.some((d) => d.status === "pending");
+    if (stillPending) {
+      state.lastMessage = `Gentle nudge, ${p.firstName} — your dose is still waiting.`;
+      state.wearableState = "reminder";
+      emit();
+    }
+  }, 5000);
+}
+
 const AFFIRM = [
   (n: string) => `Nice one, ${n}.`,
   () => `Logged — that's another step done.`,

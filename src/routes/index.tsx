@@ -2,7 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { CheckCircle2, Stethoscope } from "lucide-react";
 import { Wearable } from "@/components/Wearable";
-import { getActivePatient, pushPrescription, useMediAlert } from "@/lib/medialert-store";
+import {
+  getActivePatient,
+  pushPrescription,
+  todayLocalISO,
+  useMediAlert,
+} from "@/lib/medialert-store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -11,13 +16,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Prototype of a hospital-linked wearable antibiotic adherence system: a clinician confirms a prescription and it appears instantly on the patient's wearable.",
+          "A hospital-linked wearable antibiotic adherence system: a clinician confirms a prescription and it appears instantly on the patient's wearable.",
       },
       { property: "og:title", content: "MediAlert — Clinician to Wearable Demo" },
       {
         property: "og:description",
         content:
-          "Conceptual prototype: prescription pushed straight from clinician to a simulated wearable, with warm reminders and live adherence progress.",
+          "Prescription pushed straight from clinician to the patient's wearable, with warm reminders and live adherence progress.",
       },
     ],
   }),
@@ -38,7 +43,7 @@ function Index() {
   const [medicine, setMedicine] = useState("Amoxicillin");
   const [dose, setDose] = useState("500 mg");
   const [frequency, setFrequency] = useState(3);
-  const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
+  const [startDate, setStartDate] = useState(todayLocalISO());
   const [durationDays, setDurationDays] = useState(7);
   const [sentAt, setSentAt] = useState<string | null>(null);
 
@@ -47,21 +52,25 @@ function Index() {
 
   function confirm() {
     pushPrescription(patientId, { medicine, dose, frequency, times, startDate, durationDays });
-    setSentAt(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+    setSentAt(
+      new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+    );
   }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Clinician → wearable, in one click</h1>
+        <h1 className="gradient-text w-fit text-3xl font-bold tracking-tight">
+          Clinician → wearable, in one click
+        </h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Conceptual prototype. Confirming a prescription here feeds it straight to the patient's
-          wearable — no pharmacist step, no activation code.
+          Confirming a prescription here feeds it straight to the patient's wearable — no pharmacist
+          step, no activation code.
         </p>
       </header>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_auto]">
-        <section className="rounded-xl border border-border bg-card p-6">
+        <section className="card-lift rise-in rounded-xl border border-border bg-card/90 p-6">
           {!signedIn ? (
             <div className="flex flex-col items-start gap-4 py-10">
               <Stethoscope className="size-8 text-primary" aria-hidden />
@@ -69,7 +78,7 @@ function Index() {
               <p className="text-sm text-muted-foreground">Demo only — no real authentication.</p>
               <button
                 onClick={() => setSignedIn(true)}
-                className="rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground"
+                className="btn-glow rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground"
               >
                 Continue as Clinician
               </button>
@@ -140,7 +149,9 @@ function Index() {
                   <p className="rounded-md bg-muted px-3 py-2 text-sm">{times.join(" · ")}</p>
                 </Field>
                 <Field label="Total doses">
-                  <p className="rounded-md bg-muted px-3 py-2 text-sm">{frequency * durationDays}</p>
+                  <p className="rounded-md bg-muted px-3 py-2 text-sm">
+                    {frequency * durationDays}
+                  </p>
                 </Field>
               </div>
 
@@ -157,7 +168,8 @@ function Index() {
                   <div>
                     <p className="font-semibold">Sent to {patient.firstName}'s wearable</p>
                     <p className="text-sm text-muted-foreground">
-                      {medicine} {dose}, {frequency}× daily for {durationDays} days · pushed at {sentAt}
+                      {medicine} {dose}, {frequency}× daily for {durationDays} days · pushed at{" "}
+                      {sentAt}
                     </p>
                   </div>
                 </div>
@@ -166,24 +178,13 @@ function Index() {
           )}
         </section>
 
-        <section className="justify-self-center">
+        <section className="rise-in justify-self-center [animation-delay:150ms]">
           <h2 className="mb-4 text-center text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Patient wearable (simulated)
+            Patient wearable
           </h2>
           <Wearable />
         </section>
       </div>
-
-      <section className="mt-10 rounded-xl border border-dashed border-border p-5 text-sm text-muted-foreground">
-        <p className="font-semibold text-foreground">Future / production — not built in this prototype</p>
-        <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>Real wearable hardware and firmware</li>
-          <li>Real hospital information system (HIS) / EMR API integration</li>
-          <li>Real authentication and per-patient data security</li>
-          <li>Real push notifications and Bluetooth/network sync to a device</li>
-          <li>Real per-visit billing / activation-fee logic</li>
-        </ul>
-      </section>
     </div>
   );
 }

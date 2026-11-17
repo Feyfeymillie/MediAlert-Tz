@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   getActivePatient,
   logDose,
+  openAdvisor,
   progressOf,
   resetWearable,
   snoozeReminder,
@@ -16,11 +17,15 @@ import {
   Clock,
   Flame,
   HeartPulse,
+  Lock,
+  Mic,
   PartyPopper,
   Pill,
   SkipForward,
+  Square,
   X,
 } from "lucide-react";
+import { FREE_QUESTION_LIMIT, useVoiceAdvisor } from "@/hooks/use-voice-advisor";
 
 function Buddy({ className = "" }: { className?: string }) {
   return (
@@ -47,7 +52,12 @@ function Ring({ pct }: { pct: number }) {
         strokeDashoffset={c - (c * pct) / 100}
         transform="rotate(-90 32 32)"
       />
-      <text x="32" y="37" textAnchor="middle" className="fill-watch-foreground text-[14px] font-semibold">
+      <text
+        x="32"
+        y="37"
+        textAnchor="middle"
+        className="fill-watch-foreground text-[14px] font-semibold"
+      >
         {pct}%
       </text>
     </svg>
@@ -100,8 +110,8 @@ export function Wearable() {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="rounded-[3rem] bg-watch-body p-3 shadow-watch">
-        <div className="flex h-[340px] w-[300px] flex-col overflow-hidden rounded-[2.25rem] bg-watch-screen p-5 text-watch-foreground">
+      <div className="watch-float watch-glow rounded-[3rem] bg-watch-body p-3 shadow-watch">
+        <div className="watch-sheen flex h-[340px] w-[300px] flex-col overflow-hidden rounded-[2.25rem] bg-watch-screen p-5 text-watch-foreground">
           {s.wearableState === "idle" && (
             <div className="flex flex-1 flex-col items-center justify-center gap-2 animate-fade-in">
               <div className="flex w-full items-center justify-between text-[11px] text-watch-muted">
@@ -116,7 +126,9 @@ export function Wearable() {
               </div>
               <p className="text-5xl font-semibold tabular-nums tracking-tight">{clock}</p>
               <p className="text-sm text-watch-muted">
-                {now ? now.toLocaleDateString([], { weekday: "long", day: "numeric", month: "short" }) : ""}
+                {now
+                  ? now.toLocaleDateString([], { weekday: "long", day: "numeric", month: "short" })
+                  : ""}
               </p>
               {hasRx && nextDose && (
                 <p className="flex items-center gap-1 rounded-full bg-watch-chip px-3 py-1 text-xs">
@@ -126,7 +138,9 @@ export function Wearable() {
               )}
               <Buddy className="mt-1" />
               <p className="text-sm text-watch-muted">
-                {hasRx ? `${patient.firstName} · ${prog.taken} of ${prog.total} doses` : "No schedule yet"}
+                {hasRx
+                  ? `${patient.firstName} · ${prog.taken} of ${prog.total} doses`
+                  : "No schedule yet"}
               </p>
               {hasRx && todaysDoses.length > 0 && (
                 <div className="mt-1 w-full">
@@ -197,10 +211,27 @@ export function Wearable() {
               </div>
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
-                  <WatchBtn onClick={() => logDose("taken")} tone="primary" icon={<Check className="size-4" />} label="Taken" />
-                  <WatchBtn onClick={() => logDose("delayed")} icon={<Clock className="size-4" />} label="Delayed" />
-                  <WatchBtn onClick={() => logDose("skipped")} icon={<SkipForward className="size-4" />} label="Skipped" />
-                  <WatchBtn onClick={() => logDose("missed")} icon={<X className="size-4" />} label="Missed" />
+                  <WatchBtn
+                    onClick={() => logDose("taken")}
+                    tone="primary"
+                    icon={<Check className="size-4" />}
+                    label="Taken"
+                  />
+                  <WatchBtn
+                    onClick={() => logDose("delayed")}
+                    icon={<Clock className="size-4" />}
+                    label="Delayed"
+                  />
+                  <WatchBtn
+                    onClick={() => logDose("skipped")}
+                    icon={<SkipForward className="size-4" />}
+                    label="Skipped"
+                  />
+                  <WatchBtn
+                    onClick={() => logDose("missed")}
+                    icon={<X className="size-4" />}
+                    label="Missed"
+                  />
                 </div>
                 <button
                   onClick={snoozeReminder}
@@ -216,15 +247,22 @@ export function Wearable() {
             <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center animate-scale-in">
               <div
                 className={`grid size-14 place-items-center rounded-full ${
-                  s.lastLogged === "taken" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+                  s.lastLogged === "taken"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-foreground"
                 } pulse`}
               >
-                {s.lastLogged === "taken" ? <Check className="size-7" /> : <HeartPulse className="size-7" />}
+                {s.lastLogged === "taken" ? (
+                  <Check className="size-7" />
+                ) : (
+                  <HeartPulse className="size-7" />
+                )}
               </div>
               <p className="text-base font-semibold leading-snug">{s.lastMessage}</p>
               <Ring pct={prog.pct} />
               <p className="text-sm text-watch-muted">
-                {prog.taken} of {prog.total} doses · Day {prog.dayOf} of {patient.prescription?.durationDays}
+                {prog.taken} of {prog.total} doses · Day {prog.dayOf} of{" "}
+                {patient.prescription?.durationDays}
               </p>
               {streak > 1 && (
                 <p className="flex items-center gap-1 text-xs text-watch-muted">
@@ -233,20 +271,24 @@ export function Wearable() {
               )}
               <button
                 onClick={resetWearable}
-                className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                className="btn-glow rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
               >
                 Back to watch face
               </button>
             </div>
           )}
 
+          {s.wearableState === "advisor" && <AdvisorScreen />}
+
           {s.wearableState === "complete" && (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 bg-gradient-celebrate text-center animate-scale-in">
               <PartyPopper className="size-10 text-primary pulse" aria-hidden />
-              <p className="text-xl font-bold leading-tight">Course complete, {patient.firstName}!</p>
+              <p className="text-xl font-bold leading-tight">
+                Course complete, {patient.firstName}!
+              </p>
               <p className="text-sm text-watch-muted">
-                You finished all {prog.total} doses of {patient.prescription?.medicine}. That's the whole
-                course — beautifully done.
+                You finished all {prog.total} doses of {patient.prescription?.medicine}. That's the
+                whole course — beautifully done.
               </p>
               <Ring pct={prog.pct} />
             </div>
@@ -258,20 +300,23 @@ export function Wearable() {
         <button
           onClick={triggerReminder}
           disabled={!hasRx || prog.complete}
-          className="rounded-md border border-border bg-card px-3 py-2 text-sm font-medium disabled:opacity-50"
+          className="btn-glow rounded-md border border-border bg-card px-3 py-2 text-sm font-medium disabled:opacity-50"
         >
           Trigger next reminder
         </button>
         <button
+          onClick={openAdvisor}
+          className="btn-glow flex items-center gap-1 rounded-md border border-border bg-card px-3 py-2 text-sm font-medium"
+        >
+          <Mic className="size-4" aria-hidden /> Ask AI Doctor
+        </button>
+        <button
           onClick={resetWearable}
-          className="rounded-md border border-border bg-card px-3 py-2 text-sm font-medium"
+          className="btn-glow rounded-md border border-border bg-card px-3 py-2 text-sm font-medium"
         >
           Show watch face
         </button>
       </div>
-      <p className="max-w-xs text-center text-xs text-muted-foreground">
-        Simulated device. Reminders are triggered manually for the demo.
-      </p>
     </div>
   );
 }
@@ -299,5 +344,137 @@ function WatchBtn({
       {icon}
       {label}
     </button>
+  );
+}
+
+const T = {
+  en: {
+    idle: "Tap the mic and ask",
+    listening: "Listening…",
+    thinking: "Thinking…",
+    speaking: "Speaking…",
+    error: "Something went wrong",
+    freeLeft: (n: number, max: number) => `${n} of ${max} free left`,
+    unlimited: "Unlimited",
+    usedTitle: "Free questions used",
+    usedBody: (n: number) =>
+      `You've asked ${n} questions. Upgrade to keep talking to the AI Doctor.`,
+    upgrade: "Upgrade (demo — no charge)",
+    back: "Back to watch face",
+    close: "Close",
+    unsupported: "Voice isn't supported in this browser. Use Chrome or Edge.",
+  },
+  sw: {
+    idle: "Gusa maikrofoni uulize",
+    listening: "Inasikiliza…",
+    thinking: "Inafikiri…",
+    speaking: "Inaongea…",
+    error: "Hitilafu imetokea",
+    freeLeft: (n: number, max: number) => `Maswali ${n} kati ya ${max} yamebaki`,
+    unlimited: "Bila kikomo",
+    usedTitle: "Maswali ya bure yameisha",
+    usedBody: (n: number) =>
+      `Umeuliza maswali ${n}. Boresha ili uendelee kuzungumza na Daktari wa AI.`,
+    upgrade: "Boresha (onyesho — hakuna malipo)",
+    back: "Rudi kwenye saa",
+    close: "Funga",
+    unsupported: "Sauti haitumiki kwenye kivinjari hiki. Tumia Chrome au Edge.",
+  },
+} as const;
+
+function AdvisorScreen() {
+  const st = useMediAlert();
+  const patient = getActivePatient(st);
+  const rx = patient.prescription;
+  const context = rx
+    ? `${patient.firstName} takes ${rx.medicine} ${rx.dose}, ${rx.frequency} times daily for ${rx.durationDays} days.`
+    : "";
+  const a = useVoiceAdvisor(context);
+  const t = T[a.lang];
+  const busy = a.phase === "listening" || a.phase === "thinking" || a.phase === "speaking";
+
+  const close = () => {
+    a.stopAll();
+    resetWearable();
+  };
+
+  if (a.locked) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center animate-scale-in">
+        <Lock className="size-8 text-primary" aria-hidden />
+        <p className="text-base font-semibold">{t.usedTitle}</p>
+        <p className="text-xs text-watch-muted">{t.usedBody(FREE_QUESTION_LIMIT)}</p>
+        <button
+          onClick={a.unlock}
+          className="btn-glow rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+        >
+          {t.upgrade}
+        </button>
+        <button onClick={close} className="text-xs text-watch-muted underline">
+          {t.back}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-1 flex-col justify-between animate-fade-in">
+      <div className="flex items-center justify-between text-[11px] text-watch-muted">
+        <span className="flex items-center gap-1">
+          {(["en", "sw"] as const).map((l) => (
+            <button
+              key={l}
+              onClick={() => a.setLang(l)}
+              aria-pressed={a.lang === l}
+              aria-label={l === "en" ? "English" : "Kiswahili"}
+              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                a.lang === l ? "bg-primary text-primary-foreground" : "bg-watch-chip"
+              }`}
+            >
+              {l.toUpperCase()}
+            </button>
+          ))}
+        </span>
+        <span>{a.unlocked ? t.unlimited : t.freeLeft(a.remaining, FREE_QUESTION_LIMIT)}</span>
+      </div>
+
+      <div className="flex-1 space-y-2 overflow-y-auto py-2 text-center" aria-live="polite">
+        {!a.supported && <p className="text-xs text-watch-muted">{t.unsupported}</p>}
+        {(a.phase === "listening" || a.phase === "speaking") && (
+          <div className="flex h-8 items-center justify-center gap-1" aria-hidden>
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+              <span key={i} className="wave-bar" style={{ animationDelay: `${i * 0.11}s` }} />
+            ))}
+          </div>
+        )}
+        {a.transcript && <p className="text-sm font-medium leading-snug">“{a.transcript}”</p>}
+        {a.answer && (
+          <p className="rounded-xl bg-watch-chip p-2 text-left text-xs leading-snug">{a.answer}</p>
+        )}
+        {a.error && <p className="text-xs text-destructive">{a.error}</p>}
+        {!a.transcript && !a.answer && !a.error && (
+          <p className="pt-6 text-sm text-watch-muted">{t[a.phase]}</p>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between">
+        <button onClick={close} className="text-xs text-watch-muted underline">
+          {t.close}
+        </button>
+        <button
+          onClick={busy ? a.stopAll : a.startListening}
+          disabled={!a.supported}
+          aria-label={busy ? "Stop" : "Ask a question"}
+          className={`grid size-12 place-items-center rounded-full bg-primary text-primary-foreground disabled:opacity-50 ${
+            a.phase === "listening" ? "mic-ripple" : ""
+          }`}
+        >
+          {busy ? <Square className="size-5" /> : <Mic className="size-5" />}
+        </button>
+        <span className="w-10 text-right text-[11px] text-watch-muted">
+          {a.phase === "idle" || a.phase === "error" ? "" : t[a.phase]}
+        </span>
+      </div>
+    </div>
   );
 }

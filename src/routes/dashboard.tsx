@@ -9,7 +9,7 @@ export const Route = createFileRoute("/dashboard")({
       {
         name: "description",
         content:
-          "Clinician dashboard showing each patient's antibiotic course progress, doses taken and missed, in the MediAlert wearable prototype.",
+          "Clinician dashboard showing each patient's antibiotic course progress, doses taken and missed, in the MediAlert wearable app.",
       },
       { property: "og:title", content: "Patient Adherence Dashboard — MediAlert" },
       {
@@ -29,7 +29,7 @@ function Dashboard() {
     <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="text-3xl font-bold tracking-tight">Patient adherence</h1>
       <p className="mt-2 text-muted-foreground">
-        Simulated data. Progress updates live as doses are logged on the wearable.
+        Progress updates live as doses are logged on the wearable.
       </p>
 
       <div className="mt-8 grid gap-4">
@@ -72,8 +72,8 @@ function Dashboard() {
                       {prog.total} doses taken
                     </span>
                     <span className="inline-flex items-center gap-1">
-                      <AlertCircle className="size-4 text-accent-foreground" aria-hidden /> {prog.missed}{" "}
-                      missed or skipped
+                      <AlertCircle className="size-4 text-accent-foreground" aria-hidden />{" "}
+                      {prog.missed} missed or skipped
                     </span>
                     <span className="inline-flex items-center gap-1 text-muted-foreground">
                       <CircleDashed className="size-4" aria-hidden /> Day {prog.dayOf} of{" "}

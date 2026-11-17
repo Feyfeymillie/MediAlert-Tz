@@ -1,5 +1,12 @@
 import { useSyncExternalStore } from "react";
 
+/** Today's date as YYYY-MM-DD in the user's local timezone (toISOString() would give the UTC date). */
+export function todayLocalISO(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 export type DoseStatus = "pending" | "taken" | "delayed" | "skipped" | "missed";
 
 export type Dose = {
@@ -30,7 +37,7 @@ export type Patient = {
   doses: Dose[];
 };
 
-export type WearableState = "idle" | "updated" | "reminder" | "logged" | "complete";
+export type WearableState = "idle" | "updated" | "reminder" | "logged" | "complete" | "advisor";
 
 type State = {
   patients: Patient[];
@@ -94,7 +101,7 @@ const state: State = {
         dose: "500 mg",
         frequency: 3,
         times: ["08:00", "14:00", "20:00"],
-        startDate: new Date().toISOString().slice(0, 10),
+        startDate: todayLocalISO(),
         durationDays: 7,
       },
       13,
@@ -111,7 +118,7 @@ const state: State = {
         dose: "100 mg",
         frequency: 2,
         times: ["09:00", "21:00"],
-        startDate: new Date().toISOString().slice(0, 10),
+        startDate: todayLocalISO(),
         durationDays: 5,
       },
       9,
@@ -128,7 +135,7 @@ const state: State = {
         dose: "250 mg",
         frequency: 2,
         times: ["07:00", "19:00"],
-        startDate: new Date().toISOString().slice(0, 10),
+        startDate: todayLocalISO(),
         durationDays: 7,
       },
       4,
@@ -196,6 +203,11 @@ export function triggerReminder() {
   emit();
 }
 
+export function openAdvisor() {
+  state.wearableState = "advisor";
+  emit();
+}
+
 export function snoozeReminder() {
   const p = getActivePatient(state);
   if (!p.prescription) return;
@@ -251,7 +263,10 @@ export function progressOf(p: Patient) {
   const missed = p.doses.filter((d) => d.status === "missed" || d.status === "skipped").length;
   const logged = p.doses.filter((d) => d.status !== "pending").length;
   const dayOf = p.prescription
-    ? Math.min(p.prescription.durationDays, Math.floor(logged / Math.max(1, p.prescription.frequency)) + 1)
+    ? Math.min(
+        p.prescription.durationDays,
+        Math.floor(logged / Math.max(1, p.prescription.frequency)) + 1,
+      )
     : 0;
   return {
     total,

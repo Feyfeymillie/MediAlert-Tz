@@ -183,3 +183,83 @@
 @utility animate-fade-in { animation: ma-fade-in 0.35s ease-out; }
 @utility animate-scale-in { animation: ma-scale-in 0.3s ease-out; }
 @utility pulse { animation: ma-pulse 1.6s ease-in-out infinite; }
+
+/* ---------- Visual effects (all disabled under prefers-reduced-motion) ---------- */
+@keyframes ma-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes ma-glow {
+  0%,100% { box-shadow: var(--shadow-watch), 0 0 0 0 oklch(0.55 0.11 190 / 0.0); }
+  50% { box-shadow: var(--shadow-watch), 0 0 46px 6px oklch(0.55 0.11 190 / 0.35); }
+}
+@keyframes ma-sheen { 0% { transform: translateX(-130%) skewX(-18deg); } 55%,100% { transform: translateX(260%) skewX(-18deg); } }
+@keyframes ma-drift {
+  0% { background-position: 0% 0%, 100% 0%, 50% 100%; }
+  50% { background-position: 12% 18%, 88% 12%, 42% 90%; }
+  100% { background-position: 0% 0%, 100% 0%, 50% 100%; }
+}
+@keyframes ma-ripple { 0% { transform: scale(1); opacity: 0.55; } 100% { transform: scale(2.1); opacity: 0; } }
+@keyframes ma-wave { 0%,100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+@keyframes ma-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+/* Soft drifting colour wash behind the whole app */
+.fx-bg {
+  background-image:
+    radial-gradient(40rem 28rem at 8% 0%, oklch(0.85 0.09 190 / 0.35), transparent 60%),
+    radial-gradient(34rem 26rem at 96% 4%, oklch(0.9 0.08 75 / 0.3), transparent 60%),
+    radial-gradient(40rem 26rem at 50% 108%, oklch(0.88 0.07 200 / 0.3), transparent 60%);
+  background-size: 140% 140%, 140% 140%, 140% 140%;
+  background-repeat: no-repeat;
+  animation: ma-drift 24s ease-in-out infinite;
+}
+
+.fx-glass { backdrop-filter: blur(10px) saturate(1.4); -webkit-backdrop-filter: blur(10px) saturate(1.4); }
+
+.gradient-text {
+  background-image: linear-gradient(100deg, oklch(0.32 0.06 200), oklch(0.55 0.11 190) 55%, oklch(0.7 0.13 75));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card-lift { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+.card-lift:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -22px oklch(0.4 0.08 195 / 0.45); border-color: oklch(0.55 0.11 190 / 0.45); }
+
+.btn-glow { transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.2s ease; }
+.btn-glow:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 22px -8px oklch(0.55 0.11 190 / 0.7); filter: brightness(1.06); }
+.btn-glow:active:not(:disabled) { transform: translateY(0) scale(0.97); }
+
+.watch-float { animation: ma-float 6s ease-in-out infinite; }
+.watch-glow { animation: ma-glow 4.5s ease-in-out infinite; }
+
+/* Glass sheen sweeping across the watch screen */
+.watch-sheen { position: relative; isolation: isolate; }
+.watch-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 35%, oklch(1 0 0 / 0.09) 50%, transparent 65%);
+  animation: ma-sheen 7s ease-in-out infinite;
+}
+
+.mic-ripple { position: relative; }
+.mic-ripple::before, .mic-ripple::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: oklch(0.55 0.11 190 / 0.5);
+  z-index: -1;
+  animation: ma-ripple 1.6s ease-out infinite;
+}
+.mic-ripple::after { animation-delay: 0.8s; }
+
+.wave-bar { width: 3px; height: 18px; border-radius: 9999px; background: var(--primary); transform-origin: center; animation: ma-wave 0.9s ease-in-out infinite; }
+
+.rise-in { animation: ma-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-bg, .watch-float, .watch-glow, .watch-sheen::after, .mic-ripple::before, .mic-ripple::after,
+  .wave-bar, .rise-in, .pulse { animation: none !important; }
+  .card-lift, .btn-glow { transition: none; }
+}

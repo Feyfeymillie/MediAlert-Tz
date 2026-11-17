@@ -1,3 +1,4 @@
+import { Logo } from "@/components/Logo";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -97,7 +98,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -128,7 +130,9 @@ function RootComponent() {
       <div className="fx-bg min-h-screen bg-background text-foreground">
         <header className="fx-glass sticky top-0 z-20 border-b border-border bg-card/75">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4 px-4 py-3">
-            <span className="font-bold tracking-tight">MediAlert</span>
+            <Link to="/" aria-label="MediAlert home">
+              <Logo />
+            </Link>
           </div>
         </header>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}

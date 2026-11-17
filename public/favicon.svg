@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MediAlert">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#19b3a6"/>
+      <stop offset="1" stop-color="#0a5f6b"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <path d="M32 51C16 40 10 30 10 23c0-6 4.600-10 10-10 4.800 0 9 2.800 12 7.500C35 15.800 39.200 13 44 13c5.400 0 10 4 10 10 0 7-6 17-22 28z" fill="#fff"/>
+  <path d="M13 31h10l4-9 7 17 4-8h13" fill="none" stroke="#0e8a88" stroke-width="3.400" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="51" cy="13" r="7" fill="#f6b95c" stroke="#0a5f6b" stroke-width="2.500"/>
+</svg>
